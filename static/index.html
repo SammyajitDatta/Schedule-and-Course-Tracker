@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class = "backgroundLayer">
+
+  <head>
+    <meta charset="UTF-8" />
+    <title>Schedules & Notes</title>
+    <link rel="stylesheet" href="/static/styles/styles.css" />
+  </head>
+
+  <body class = "centerElements">
+    <h1 class="bannerHeader"> Schedules & Notes </h1>
+    <div class="buttonTabs">
+      <button onclick="showTab('schedules')"> Schedules </button>
+      <button onclick="showTab('notes')"> Notes </button>
+    </div>
+
+    <!--Schedule Tab-->
+    <div id="schedules" class="contentTab">
+      <h2>Schedules</h2>
+      <input type="text" id="personName" placeholder="Person Name" />
+      <input type="file" id="scheduleFile" accept="image/png" />
+      <button onclick="uploadSchedule()"> Upload Schedule </button>
+      <h3> Existing Schedules </h3>
+      <div id="scheduleList"></div>
+    </div>
+
+    <!--Notes Tab-->
+    <div id="notes" class="contentTab">
+      <h2>Notes</h2>
+      <input type="text" id="courseName" placeholder="Course Name"/>
+      <input type="file" id="notesFile" />
+      <button onclick="uploadNote()"> Upload Note </button>
+      <h3> Courses & Notes </h3>
+      <div id="coursesList"></div>
+    </div>
+
+    <script>
+
+      // Hide tabs accordingly, done via CSS file
+      function showTab(tabId) {
+        document.getElementById('schedules').classList.remove('active');
+        document.getElementById('notes').classList.remove('active');
+        document.getElementById(tabId).classList.add('active');
+      }
+
+      // Default shows schedules upon launch
+      showTab('schedules');
+
+      async function fetchSchedules() {
+        const res = await fetch('/api/schedules');
+        const data = await res.json();
+        const list = document.getElementById('scheduleList');
+        list.innerHTML = '';
+
+        data.forEach(schedule => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          div.innerHTML = `
+            <p>Person: ${schedule.personName}</p>
+            <img src="${schedule.filePath}" alt="${schedule.personName} timetable" />
+            <button onclick="deleteSchedule(${schedule.id})"> Delete </button>
+          `;
+          list.appendChild(div);
+        });
+      }
+
+      async function uploadSchedule() {
+        const personName = document.getElementById('personName').value;
+        const fileInput = document.getElementById('scheduleFile');
+        // Files[0] is used since there can be multiple files inputted
+        if (!personName || !fileInput.files[0]) {
+          alert('Please provide person name and a PNG file');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('personName', personName);
+        formData.append('file', fileInput.files[0]);
+
+        const res = await fetch('/api/schedules', {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          document.getElementById('personName').value = '';
+          document.getElementById('scheduleFile').value = null;
+          fetchSchedules();
+        } else {
+          const error = await res.json();
+          alert('Upload failed: ' + (error.error || JSON.stringify(error)));
+        }
+      }
+
+      async function deleteSchedule(id) {
+        const res = await fetch('/api/schedules/' + id, { method: 'DELETE' });
+        if (res.ok) {
+          fetchSchedules();
+        } else {
+          alert('Failed to delete schedule');
+        }
+      }
+
+      async function fetchCourses() {
+        const res = await fetch('/api/notes');
+        const data = await res.json();
+        const coursesList = document.getElementById('coursesList');
+        coursesList.innerHTML = '';
+
+        data.forEach(course => {
+            // We check to see if length >0 so that we do not display courses that possess no notes
+            if (course.notes.length > 0) {
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.innerHTML = `
+                    <h4>Course: ${course.courseName}</h4>
+                    <div style="margin-left:20px;">
+                        ${course.notes
+                            .map(
+                                note =>
+                                    `<div>
+                                        <img src="${note.filePath}" alt="${note.filePath}" />
+                                        <button onclick="deleteNote(${note.id})"> Delete </button>
+                                    </div>`
+                            )
+                            .join('')}
+                    </div>
+                `;
+                coursesList.appendChild(div);
+            }
+          });
+        }
+
+      async function uploadNote() {
+        const courseName = document.getElementById('courseName').value;
+        const fileInput = document.getElementById('notesFile');
+        // Files[0] is used since there can be multiple files inputted
+        if (!courseName || !fileInput.files[0]) {
+          alert('Please provide course name and a file');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('courseName', courseName);
+        formData.append('file', fileInput.files[0]);
+
+        const res = await fetch('/api/notes', {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          document.getElementById('courseName').value = '';
+          document.getElementById('notesFile').value = null;
+          fetchCourses();
+        } else {
+          const error = await res.json();
+          alert('Upload failed: ' + (error.error || JSON.stringify(error)));
+        }
+      }
+
+      async function deleteNote(noteId) {
+      const res = await fetch('/api/notes/' + noteId, { method: 'DELETE' });
+      if (res.ok) {
+          fetchCourses();
+      } else {
+          alert('Failed to delete note');
+      }
+      }
+      
+      fetchSchedules();
+      fetchCourses();
+
+    </script>
+  </body>
+</html>

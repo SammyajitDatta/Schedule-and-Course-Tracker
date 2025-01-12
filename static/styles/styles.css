@@ -1,0 +1,65 @@
+/* Style sheet used in index.html to design the front end of the applications.
+Can adjust this file to adjust the visual display of the front end in terms of aesthetic.*/
+.bannerHeader{
+  text-align: center;
+  font-size: 50px;
+  font-family: cursive;
+  padding: 60px;
+  margin: 0px;
+  margin-bottom: 30px;
+  background-color: #1995AD;
+  width:100%;
+  height:100%;
+}
+
+.buttonTabs{
+  margin-bottom: 1rem;
+}
+
+.contentTab { display: none; }
+.active { display: block; }
+
+.centerElements{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.buttonTabs button {
+  background-color: #FEFEFE; 
+  color: #111111;
+  border: none;
+  padding: 10px 20px;
+  font-size: 18px;
+  margin: 0 10px;
+  cursor: pointer;
+  border-radius: 15px;
+}
+
+.buttonTabs button:hover{
+  background-color: #111111; 
+  color: #FEFEFE;
+}
+
+img {
+  max-width: 1000px;
+  max-height: 1000px;
+  display: block;
+  margin: 0.5rem 0;
+}
+
+.item {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  margin: 0.5rem;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.backgroundLayer{
+  background-color: #A1D6E2;
+}
+
