@@ -11,3 +11,5 @@ Features:
   - View courses with associated notes which are consistently updated and displayed
   - View schedules of various different people
   - Able to delete certain schedules or notes
+
+https://github.com/user-attachments/assets/80088c94-a7dd-404a-a0a3-6c36dcc11a33
